@@ -1,12 +1,36 @@
 
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from "../../Context/AuthProvider";
 
 const Login = () => {
-    const { register,formState: { errors }, handleSubmit } = useForm();
 
-    const handleLogin = data =>
-    console.log(data)
+    const { logIn } = useContext(AuthContext)
+    let navigate = useNavigate();
+    let location = useLocation();
+    let from = location.state?.from?.pathname || "/";
+    const [error, setError] = useState('')
+
+    const { register, formState: { errors }, handleSubmit } = useForm();
+
+    const handleLogin = data => {
+        console.log(data)
+        setError('')
+        logIn(data.email, data.password)
+            // setError('')
+            .then((result) => {
+                const user = result.user;
+                console.log(user)
+                navigate(from, { replace: true });
+
+            })
+            .catch((error) => {
+                console.log(error.message)
+                setError(error.message)
+            });
+    }
+
 
     return (
         <div className='flex justify-center items-center h-[600px]'>
@@ -26,12 +50,17 @@ const Login = () => {
                         <label className="label">
                             <span className="label-text text-xl">Password</span>
                         </label>
-                        <input type="password" {...register("password",{ required: "Password is required",minLength: { value: 6, message: "password must be 6 character or longer" } })} placeholder="Password" className="input input-bordered w-full " />
+                        <input type="password" {...register("password", { required: "Password is required", minLength: { value: 6, message: "password must be 6 character or longer" } })} placeholder="Password" className="input input-bordered w-full " />
+                    </div>
+                    <div>
+                        {
+                            error && <p className="text-red-600">{error}</p>
+                        }
                     </div>
                     <label className="label">
-                            <span className="label-text">Forget Password?</span>
-                        </label>
-                        {errors.password && <p className="text-red-600" role="alert">{errors.password?.message}</p>}
+                        <span className="label-text">Forget Password?</span>
+                    </label>
+                    {errors.password && <p className="text-red-600" role="alert">{errors.password?.message}</p>}
                     <input type="submit" className='btn btn-accent w-full mt-4' value='Login' />
                 </form>
                 <p className='mt-3 text-center'>New to Doctors Portal? <Link className='text-secondary' to='/signup'>Create New Account</Link></p>

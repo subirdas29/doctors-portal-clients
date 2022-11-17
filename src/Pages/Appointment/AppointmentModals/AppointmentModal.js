@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 import { AuthContext } from '../../../Context/AuthProvider';
 
-const AppointmentModal = ({ booking, selected,setBooking }) => {
+const AppointmentModal = ({ booking, selected,setBooking,refetch }) => {
     const {user} = useContext(AuthContext)
    
     const { name:treatmentName, slots } = booking
@@ -42,6 +42,7 @@ const AppointmentModal = ({ booking, selected,setBooking }) => {
             {
                 toast.success('booking done')
                 setBooking(null)
+                refetch()
             }
         })
 

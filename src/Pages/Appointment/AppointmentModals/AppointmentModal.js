@@ -44,6 +44,9 @@ const AppointmentModal = ({ booking, selected,setBooking,refetch }) => {
                 setBooking(null)
                 refetch()
             }
+            else{
+                toast.error(data.message)
+            }
         })
 
       

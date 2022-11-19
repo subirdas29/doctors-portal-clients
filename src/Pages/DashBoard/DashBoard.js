@@ -10,7 +10,11 @@ const DashBoard = () => {
     const{data:bookedDashboard=[] }=useQuery({
         queryKey:['bookings',user?.email],
         queryFn:async()=>{
-            const res = await fetch(uri)
+            const res = await fetch(uri,{
+              headers:{
+                authorization:`bearer ${localStorage.getItem('accessToken')}`
+              }
+            })
             const data = await res.json()
             return data;
         }

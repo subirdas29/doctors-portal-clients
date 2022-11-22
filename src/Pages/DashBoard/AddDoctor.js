@@ -35,6 +35,7 @@ const AddDoctor = () => {
             const res = await fetch('http://localhost:5000/appointmentSpeciality')
             const data = await res.json()
             return data;
+            console.log(data)
         }
     })
     if(isLoading)
@@ -67,7 +68,7 @@ const AddDoctor = () => {
                         <select className="select w-full max-w-xs input-bordered" {...register("select", { required: "select is required" })}>
  
 {
-    specialities.map(speciality =>  <option key={speciality._id} value={speciality.name}>{speciality.name}</option>)
+    specialities?.map(speciality =>  <option key={speciality._id} value={speciality.name}>{speciality.name}</option>)
 }
 </select>
                     </div>

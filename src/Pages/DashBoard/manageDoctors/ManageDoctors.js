@@ -1,21 +1,59 @@
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
+import ConfirmationModal from '../../Shared/ConfirmationModal/ConfirmationModal';
 
 const ManageDoctors = () => {
+    const [deleteDoctor,setDeleteDoctor]= useState(null)
 
-    const {data:doctors=[],isLoading} = useQuery({
+    const deleteDoctorDetails = ()=>
+    {
+        setDeleteDoctor(null)
+    }
+
+   
+
+
+    const { data: doctors, isLoading, refetch } = useQuery({
         queryKey: ['doctors'],
-        queryFn: async()=>{
-           const res = await fetch('http://localhost:5000/doctors',{
-            headers:{
-                authorization:`bearer ${localStorage.getItem('accessToken')}`
-            },
-           })
-           const data = await res.json()
-           return data;
-        }
-        })
+        queryFn: async () => {
+            try {
+                const res = await fetch('http://localhost:5000/doctors', {
+                    headers: {
+                        authorization: `bearer ${localStorage.getItem('accessToken')}`
+                    }
+                });
+                const data = await res.json();
+                return data;
+            }
+            catch (error) {
 
+            }
+        }
+    });
+
+    if(isLoading)
+    {
+        return <div>loading</div>
+    }
+
+    
+    const handleDeleteDoctor = doctor => {
+        fetch(`http://localhost:5000/doctors/${doctor._id}`, {
+            method: 'DELETE', 
+            headers: {
+                authorization: `bearer ${localStorage.getItem('accessToken')}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.deletedCount > 0){
+                refetch();
+                toast('successfully deleted')
+                
+            }
+        })
+    }
     return (
         <div>
             <div className="overflow-x-auto w-full">
@@ -60,9 +98,21 @@ const ManageDoctors = () => {
             </td>
             <td>{doctor.speciality}</td>
             <th>
-              <button className="btn btn-error ">Delete</button>
+            <label className="btn btn-error" onClick={()=>setDeleteDoctor(doctor)}
+            htmlFor="confirmation-modal" >Delete</label>
+              
             </th>
           </tr>)
+      }
+
+      {
+        deleteDoctor && <ConfirmationModal deleteDoctorDetails ={deleteDoctorDetails}
+        Delete={handleDeleteDoctor}
+        deleteDoctor={deleteDoctor}
+        deleteMessage = {`Delete`}
+        title={`Are you sure you want to delete?`}
+        message = {`If you delete ${deleteDoctor.name}. It cannot be undone`}
+        ></ConfirmationModal>
       }
     
     </tbody>

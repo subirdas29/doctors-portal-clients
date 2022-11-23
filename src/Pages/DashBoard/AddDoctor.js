@@ -14,16 +14,32 @@ const AddDoctor = () => {
         const formData = new FormData();
         formData.append('image',data.image[0] );
 
-        fetch(`https://api.imgbb.com/1/upload?expiration=600&key=${imgHostKey}`,{
+        fetch(`https://api.imgbb.com/1/upload?&key=${imgHostKey}`,{
 
         method:'POST',
         body: formData
         })
         .then(res => res.json())
-        .then(result => 
+        .then(imgData => 
             {
-                if(result.success){
-                    console.log(result.data.url)
+                if(imgData.success){
+                    console.log(imgData.data.url)
+                    const doctor = {
+                        name:data.name,
+                        email:data.email,
+                        speciality:data.select,
+                        image:imgData.data.url
+                    }
+                    fetch('http://localhost:5000/doctors',{
+                        method:'POST',
+                        headers:{
+                            'content-type':'application/json',
+                            authorization:`bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        body:JSON.stringify(doctor)
+                    })
+                    .then(res=>res.json())
+                    .then(data=>console.log(data))
                 }
             }
             )
@@ -35,7 +51,7 @@ const AddDoctor = () => {
             const res = await fetch('http://localhost:5000/appointmentSpeciality')
             const data = await res.json()
             return data;
-            console.log(data)
+      
         }
     })
     if(isLoading)
